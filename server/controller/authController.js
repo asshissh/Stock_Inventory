@@ -10,14 +10,15 @@ const login = async (req, res) => {
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ errro: "Password doesnot match" });
+      return res.status(400).json({ error: "Password does not match" });
     }
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "5h",
     });
-    res.json({ token });
+    const userResponse = { _id: user._id, username: user.username, email: user.email, token };
+    res.json(userResponse);
   } catch (err) {
-    res.status(500).json({ err: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 const signup = async (req, res) => {
@@ -26,18 +27,19 @@ const signup = async (req, res) => {
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
       if (existingUser.username == username) {
-        return res.status(400).json("Username is already existing");
+        return res.status(400).json({ error: "Username is already existing" });
       }
       if ((existingUser.email === email)) {
-        return res.status(400).json("email already existing");
+        return res.status(400).json({ error: "Email already existing" });
       }
     }
-    const hashedPassword = await bcrypt.hash(password,10)
-    const user = new User({username,email,password:hashedPassword})
-    await user.save()
-    res.status(202).json({message:"You are login"})
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ username, email, password: hashedPassword });
+    await user.save();
+    const userResponse = { _id: user._id, username: user.username, email: user.email };
+    res.status(201).json(userResponse);
   } catch (err) {
-    res.status(400).json({ err: err.message });
+    res.status(400).json({ error: err.message });
   }
 };
 module.exports={

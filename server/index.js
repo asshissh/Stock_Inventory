@@ -18,23 +18,24 @@ app.use((req,res,next)=>{
   next()
 })
 
-//CORS
 const allowedOrigins = [
-
-]
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "https://stock-inventory-z8ce.onrender.com"
+];
 
 app.use(
   cors({
-    origin:(origin,callback)=>{
-      if(!origin || allowedOrigins.includes(origin)){
-        callback(null,true)
-      }else{
-        console.error(`Bloked by CORS:${origin}`)
-        callback(new Error('Not allowed by CORS'))
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.error(`Blocked by CORS: ${origin}`);
+        callback(new Error("Not allowed by CORS"));
       }
     },
-    methods:"GET,POST,PUT,DELETE",
-    allowedHeaders:"Content-Type,Authrization"
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization"
   })
 )
 //Routes
