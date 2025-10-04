@@ -14,21 +14,33 @@ const errorHandler = require('./middlewares/ExpressError')
 
 //log all request 
 app.use((req,res,next)=>{
-  console.log(req.path,req.method)
+  console.log(`${req.method} ${req.path} - Origin: ${req.get('Origin') || 'No origin'}`)
   next()
 })
 
-const allowedOrigins = [
-  "https://stock-inventory-z8ce.onrender.com"
-];
+// CORS configuration - simplified for better compatibility
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "http://localhost:3001", 
+    "https://stock-inventory-z8ce.onrender.com",
+    "https://stockwise-omega.vercel.app"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  optionsSuccessStatus: 200
+}));
 
-app.use(
-  cors({
-    origin: false,
-    methods: "GET,POST,PUT,DELETE",
-    allowedHeaders: "Content-Type,Authorization"
-  })
-)
+// Handle preflight OPTIONS requests explicitly
+app.options('*', (req, res) => {
+  console.log('OPTIONS request received for:', req.path);
+  res.header('Access-Control-Allow-Origin', req.get('Origin') || '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.status(200).end();
+});
 //Routes
 const companyRoutes = require("./routes/companyRoutes");
 const stockRoutes = require("./routes/stockRoutes");
@@ -38,7 +50,17 @@ const predictionRoutes = require("./routes/predictionRoutes");
 const whatsappRoutes = require("./routes/chatRoutes");
 
 app.get("/",(req,res)=>{
-  res.json("/route here")
+  res.json({message: "Server is running", timestamp: new Date().toISOString()})
+})
+
+// Health check endpoint
+app.get("/health",(req,res)=>{
+  res.json({status: "OK", message: "Server is healthy"})
+})
+
+// Test CORS endpoint
+app.get("/test-cors",(req,res)=>{
+  res.json({message: "CORS test successful", origin: req.get('Origin')})
 })
 
 //routes
@@ -52,10 +74,14 @@ app.use("/api/dashboard/companies/:companyId/stocks",stockRoutes)
 
 app.use(errorHandler)
 
-mongoose.connect(process.env.MONGO_URI).then(()=>{
-  app.listen(process.env.PORT,()=>{
-    console.log(
-      `Connected to DB & Server running on port http://localhost:${process.env.PORT}`
-    )
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("✅ Connected to MongoDB");
+    app.listen(process.env.PORT || 5000, () => {
+      console.log(`🚀 Server running on port ${process.env.PORT || 5000}`);
+    });
   })
-})
+  .catch((error) => {
+    console.error("❌ MongoDB connection error:", error);
+    process.exit(1);
+  });

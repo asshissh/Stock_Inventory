@@ -6,15 +6,15 @@ const stockSchema = new mongoose.Schema({
         required:true
     },
     totalUnits:{
-        type:String,
+        type:Number,
         required:true
     },
     UnitSold:{
-        type:String,
+        type:Number,
         required:true
     },
-    priceperUnit:{
-        type:String,
+    pricePerUnit:{
+        type:Number,
         required:true
     },
     company:{

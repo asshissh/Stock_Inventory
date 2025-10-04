@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 //Get all stocks for a company
 const getAllStocks = async (req, res) => {
-  const { companyId } = req.parms;
+  const { companyId } = req.params;
   if (!mongoose.Types.ObjectId.isValid(companyId)) {
     return res.status(404).json({ error: "Invalid company ID" });
   }
@@ -31,7 +31,7 @@ const getSingleStock = async (req, res) => {
         .status(404)
         .json({ error: "Stock not found for this company" });
     }
-    res, status(200).json(stock);
+    res.status(200).json(stock);
   } catch (error) {
     res.status(401).json({ error: error.message });
   }
@@ -78,12 +78,13 @@ const updateStock = async (req, res) => {
         _id: stockId,
         company: companyId,
       },
-      update,
+      updateData,
       { new: true, runValidators: true }
     );
     if(!stock){
       return res.status(401).json({error:"No stock find for this company"})
     }
+    res.status(200).json(stock);
   } catch (error) {
     res.status(402).json({ error: error.message });
   }
