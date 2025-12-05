@@ -20,13 +20,22 @@ app.use((req,res,next)=>{
 
 // CORS configuration - simplified for better compatibility
 app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "http://localhost:3001", 
-    "https://stock-inventory-z8ce.onrender.com",
-    "https://stockwise-omega.vercel.app",
-   " https://stock-inventory-pe4s.vercel.app/"
-  ],
+  origin: function(origin, callback) {
+    const allowedOrigins = [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://stock-inventory-z8ce.onrender.com",
+      "https://stockwise-omega.vercel.app",
+      "https://stock-inventory-pe4s.vercel.app"
+    ];
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    // Allow all Vercel preview URLs
+    if (origin.includes('vercel.app')) return callback(null, true);
+    // Allow specific origins
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
