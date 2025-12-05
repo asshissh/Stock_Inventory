@@ -24,7 +24,8 @@ app.use(cors({
     "http://localhost:3000",
     "http://localhost:3001", 
     "https://stock-inventory-z8ce.onrender.com",
-    "https://stockwise-omega.vercel.app"
+    "https://stockwise-omega.vercel.app",
+   " https://stock-inventory-pe4s.vercel.app/"
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -33,14 +34,7 @@ app.use(cors({
 }));
 
 // Handle preflight OPTIONS requests explicitly
-app.options('*', (req, res) => {
-  console.log('OPTIONS request received for:', req.path);
-  res.header('Access-Control-Allow-Origin', req.get('Origin') || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.status(200).end();
-});
+
 //Routes
 const companyRoutes = require("./routes/companyRoutes");
 const stockRoutes = require("./routes/stockRoutes");
